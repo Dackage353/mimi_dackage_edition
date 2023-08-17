@@ -218,8 +218,19 @@ void display_sm64_magnitude_test() {
         struct Vec2 v = { cdata.c[0].x, cdata.c[0].y };
         struct Vec2 netV = { 0, 0 };
 
-        if (abs(v.x) >= 8) { netV.x = abs(v.x) - 6; }
-        if (abs(v.y) >= 8) { netV.y = abs(v.y) - 6; }
+        if (v.x <= -8) {
+            netV.x = v.x + 6;
+        }
+        else if (v.x >= 8) {
+            netV.x = v.x - 6;
+        }
+        
+        if (v.y <= -8) {
+            netV.y = v.y + 6;
+        }
+        else if (v.y >= 8) {
+            netV.y = v.y - 6;
+        }
 
         float magnitudeNoCap = sqrt(netV.x * netV.x + netV.y * netV.y);
         float magnitude = magnitudeNoCap;
