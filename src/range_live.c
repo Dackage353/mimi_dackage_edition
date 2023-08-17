@@ -196,9 +196,7 @@ void display_sm64_magnitude_test() {
     int count = 0,
         line_height = 11,
         show_history = 1,
-        sz_history = 10240,
-        zoomout = 0;
-    float zoomout_factor = 1;
+        sz_history = 10240;
     text_set_line_height(line_height);
     display_context_t ctx;
 
@@ -208,7 +206,7 @@ void display_sm64_magnitude_test() {
     dfs_read(point, size, 1, f);
     dfs_close(f);
 
-    char * title_str = "values that affect magnitude calculation";
+    char * title_str = "values that affect the magnitude calculation";
 
     struct Vec2 history[sz_history];
 
@@ -286,14 +284,14 @@ void display_sm64_magnitude_test() {
 
             for (int i = count; i > 0; i--) {
                 if (history_update == 1) history[i] = history[i - 1];
-                int x = smax(0, smin(320, (history[i].x * zoomout_factor) + 160));
-                int y = smax(0, smin(240, ((history[i].y * zoomout_factor) * -1) + 120));
+                int x = smax(0, smin(320, history[i].x+ 160));
+                int y = smax(0, smin(240, (history[i].y * -1) + 120));
                 graphics_draw_pixel(ctx, x, y, history_color);
             }
         }
 
-        int x = smax(0, smin(320, (vNoDeadZone.x * zoomout_factor) + 158));
-        int y = smax(0, smin(240, ((vNoDeadZone.y * zoomout_factor) * -1) + 118));
+        int x = smax(0, smin(320, vNoDeadZone.x + 158));
+        int y = smax(0, smin(240, (vNoDeadZone.y * -1) + 118));
         graphics_draw_sprite(ctx, x, y, point);
 
 
@@ -311,20 +309,9 @@ void display_sm64_magnitude_test() {
             count = 0;
         }
 
-        /*
-        if (cdata.c[0].Z) {
-            zoomout ^= 1;
-            zoomout_factor = (zoomout == 0) ? 1 : 0.75;
-        }
-        */
-
         text_set_font(FONT_MEDIUM);
         snprintf(buf, sizeof(buf), "%s", title_str);
         text_draw(ctx, 160, 15, buf, ALIGN_CENTER);
-
-        if (zoomout) {
-            text_draw(ctx, 16, 213, "75\% scale", ALIGN_LEFT);
-        }
 
         text_set_font(FONT_MEDIUM);
         graphics_set_color(graphics_make_color(128, 128, 128, 255), 0);

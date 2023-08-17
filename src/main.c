@@ -64,7 +64,7 @@ int main(void)
 
                 graphics_set_color(COLOR_FOREGROUND, 0);
                 text_set_font(FONT_BOLD);
-                text_draw(ctx, 32, 24, "mimi dackage edition\ngit-" ROM_VERSION " (built on " __DATE__ ")", ALIGN_LEFT);
+                text_draw(ctx, 32, 12, "mimi dackage edition\ngit-" ROM_VERSION " (built on " __DATE__ ")", ALIGN_LEFT);
 
                 static const char *options[] = {
                     "Range test (1 sample)",
