@@ -1,5 +1,5 @@
-[Example screenshot](doc/mimi_dackage_edition.png)
-[Example screenshot](doc/mimi.png)
+![Example screenshot](doc/mimi_dackage_edition.png)
+![Example screenshot](doc/mimi.png)
 
 Fork of wermi's mimi z64 that is used to test controller angles.
 
