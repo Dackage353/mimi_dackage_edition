@@ -3,9 +3,9 @@ SOURCE_DIR=src
 BUILD_DIR=build
 include $(N64_INST)/include/n64.mk
 ROM_VERSION=$(shell git describe --always --match 'NOT A TAG')
-NAME=mimi-$(ROM_VERSION)
+NAME=mimi_dackage_edition-$(ROM_VERSION)
 ROMNAME=$(NAME).z64
-REPO_URL=github.com/wermipls/mimi
+REPO_URL=github.com/Dackage353/mimi_dackage_edition
 FS=$(BUILD_DIR)/data.dfs
 
 N64_CFLAGS += -DROM_VERSION=\""$(ROM_VERSION)"\"
@@ -35,6 +35,7 @@ $(FS): $(wildcard fs/*) $(wildcard gfx/*)
 	$(N64_ROOTDIR)/bin/mksprite 32 gfx/stick_7.png fs/gfx/stick_7.sprite
 	$(N64_ROOTDIR)/bin/mksprite 32 gfx/stick_neutral.png fs/gfx/stick_neutral.sprite
 	$(N64_ROOTDIR)/bin/mksprite 32 gfx/point.png fs/gfx/point.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/best_circle.png fs/gfx/circle.sprite
 	$(N64_MKDFS) $@ fs
 
 $(BUILD_DIR)/$(NAME).elf: $(OBJS)

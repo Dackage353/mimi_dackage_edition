@@ -64,7 +64,7 @@ int main(void)
 
                 graphics_set_color(COLOR_FOREGROUND, 0);
                 text_set_font(FONT_BOLD);
-                text_draw(ctx, 32, 24, "mimi dackage edition git-" ROM_VERSION " (built on " __DATE__ ")", ALIGN_LEFT);
+                text_draw(ctx, 32, 24, "mimi dackage edition\ngit-" ROM_VERSION " (built on " __DATE__ ")", ALIGN_LEFT);
 
                 static const char *options[] = {
                     "Range test (1 sample)",
@@ -165,14 +165,12 @@ int main(void)
                 text_set_font(FONT_MEDIUM);
 
                 text_draw_wordwrap(ctx, 32, 44, 320-64, 
-                    "mimi controller test ROM by wermi\n"
+                    "SM64 controller test ROM by Dackage but\n"
+                    "this is simply a fork of wermi's project.\n"
+                    "Most of the credit goes to her and her contributors.\n"
                     "version " ROM_VERSION ", built on " __DATE__ "\n\n"
-                    REPO_URL "\n\n"
-                    "Enter Command font by Font End Dev (fontenddev.com), "
-                    "licensed under CC BY 4.0\n\n"
-                    "This ROM is heavily inspired by sanni's controllertest "
-                    "port for N64, as well as max257612's fork of it, however "
-                    "it is written completely from scratch.\n\n"
+                    "my fork: "REPO_URL "\n"
+                    "main repo: github.com/wermipls/mimi"
                 );
 
                 display_show(ctx);
@@ -203,10 +201,9 @@ int main(void)
                 text_draw_wordwrap(ctx, 32, 44, 320-64, 
                     "the magnitude is a float while the stick x and y are signed bytes\n"
                     "Maximum magnitude is 64.0f\n"
-                    "x and y values below 8 are ignored\n"
                     "x and y values below 8 are ignored\n\n"
 
-                    "magnitude calculation: \n"
+                    "simplified magnitude calculation: \n"
                     "x = abs(x) - 6\n"
                     "y = abs(y) - 6\n"
                     "magnitude = sqrt(x^2 + y^2)\n"
@@ -233,6 +230,7 @@ int main(void)
                 "Range testing cont.",
                 "Live range display",
                 "Oscilloscope display",
+                "SM64 magnitude explanation/test",
             };
             const int pages = sizeof(page_names) / sizeof(char*);
             int page = 0;
@@ -360,6 +358,13 @@ int main(void)
                         "Displays live X/Y values on an oscilloscope-style "
                         "display. Useful for identifying skips and "
                         "snapback issues.\n\n"
+                    );
+                    break;
+                case 7:
+                    text_draw_wordwrap(ctx, 32, 44, 320-64, 
+                        "this displays live values similiar to the live\n"
+                        "range display. It's a good demonstration of which\n"
+                        "values affect the magnitude calculation.\n\n"
                     );
                     break;
                 }

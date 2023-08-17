@@ -5,6 +5,7 @@
 
 #include "range_test.h"
 #include "range_live.h"
+#include "drawing.h"
 #include "text.h"
 #include "colors.h"
 #include "input.h"
@@ -178,6 +179,18 @@ void display_live_ranges() {
 
 }
 
+void draw_deadzone(display_context_t ctx)
+{
+    uint32_t c_red = graphics_make_color(255, 0, 0, 255);
+
+    draw_aa_line(ctx, 153, 0, 153, 239, c_red);
+    draw_aa_line(ctx, 167, 0, 167, 239, c_red);
+
+    draw_aa_line(ctx, 0, 113, 319, 113, c_red);
+    draw_aa_line(ctx, 0, 127, 319, 127, c_red);
+}
+
+
 void display_sm64_magnitude_test() {
     
     int count = 0,
@@ -191,10 +204,11 @@ void display_sm64_magnitude_test() {
 
     int f = dfs_open("/gfx/point.sprite");
     int size = dfs_size(f);
-    char * title_str = "live values that count";
     sprite_t *point = malloc(size);
     dfs_read(point, size, 1, f);
     dfs_close(f);
+
+    char * title_str = "values that affect magnitude calculation";
 
     struct Vec2 history[sz_history];
 
@@ -203,9 +217,12 @@ void display_sm64_magnitude_test() {
     for (;;) {
         while ((ctx = display_lock()) == 0) {}
         display_show(ctx);
+        
 
         graphics_fill_screen(ctx, COLOR_BACKGROUND);
         graphics_set_color(COLOR_FOREGROUND, 0);
+
+        draw_deadzone(ctx);
 
         controller_scan();
         struct controller_data cdata = get_keys_pressed();
@@ -252,19 +269,6 @@ void display_sm64_magnitude_test() {
         snprintf(buf, sizeof(buf), "%3d\n%3d\n%3d\n%3d\n%.2f\n%.2f\n%.2f", v.x, v.y, netV.x, netV.y, magnitude, magnitudeNoCap, angle);
         text_draw(ctx, 242, 80 - line_height, buf, ALIGN_RIGHT);
 
-            
-
-        draw_center_cross(ctx, 160);
-
-        /*
-        draw_stick_angles(
-            ctx,
-            *live_comparisons[current_comparison],
-            comparison_color,
-            zoomout,
-            160
-        );
-        */
 
         if (show_history == 1) {
             int history_update = 0;
@@ -292,6 +296,8 @@ void display_sm64_magnitude_test() {
         int y = smax(0, smin(240, ((vNoDeadZone.y * zoomout_factor) * -1) + 118));
         graphics_draw_sprite(ctx, x, y, point);
 
+
+
         if (cdata.c[0].start) {
             break;
         }
@@ -305,10 +311,12 @@ void display_sm64_magnitude_test() {
             count = 0;
         }
 
+        /*
         if (cdata.c[0].Z) {
             zoomout ^= 1;
             zoomout_factor = (zoomout == 0) ? 1 : 0.75;
         }
+        */
 
         text_set_font(FONT_MEDIUM);
         snprintf(buf, sizeof(buf), "%s", title_str);
