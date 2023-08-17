@@ -183,9 +183,7 @@ void display_sm64_magnitude_test() {
     int count = 0,
         line_height = 11,
         show_history = 1,
-        sz_history = 1024,
-        current_comparison = 1,
-        comparison_count = sizeof(live_comparisons) / sizeof(0),
+        sz_history = 10240,
         zoomout = 0;
     float zoomout_factor = 1;
     text_set_line_height(line_height);
@@ -193,15 +191,14 @@ void display_sm64_magnitude_test() {
 
     int f = dfs_open("/gfx/point.sprite");
     int size = dfs_size(f);
-    char * title_str = get_title_str(current_comparison);
+    char * title_str = "live values that count";
     sprite_t *point = malloc(size);
     dfs_read(point, size, 1, f);
     dfs_close(f);
 
     struct Vec2 history[sz_history];
 
-    uint32_t comparison_color = graphics_make_color(64, 255, 0, 255),
-             history_color = graphics_make_color(0, 192, 255, 255);
+    uint32_t history_color = graphics_make_color(0, 192, 255, 255);
 
     for (;;) {
         while ((ctx = display_lock()) == 0) {}
@@ -216,7 +213,16 @@ void display_sm64_magnitude_test() {
 
         
         struct Vec2 v = { cdata.c[0].x, cdata.c[0].y };
+        struct Vec2 vNoDeadZone = { cdata.c[0].x, cdata.c[0].y };
         struct Vec2 netV = { 0, 0 };
+
+        if (vNoDeadZone.x < 8 && vNoDeadZone.x > -8) {
+            vNoDeadZone.x = 0;
+        }
+        if (vNoDeadZone.y < 8 && vNoDeadZone.y > -8) {
+            vNoDeadZone.y = 0;
+        }
+
 
         if (v.x <= -8) {
             netV.x = v.x + 6;
@@ -236,7 +242,7 @@ void display_sm64_magnitude_test() {
         float magnitude = magnitudeNoCap;
         if (magnitudeNoCap > 64.0f) { magnitude = 64.0f; }
 
-        float angle = atan2(netV.y, netV.x) * 180 / M_PI;
+        float angle = atan2(abs(netV.y), abs(netV.x)) * 180 / M_PI;
 
         snprintf(buf, sizeof(buf), "x\ny\nnetX\nnetY\nmag\nmagNoCap\nangle");
         text_set_font(FONT_MEDIUM);
@@ -249,25 +255,29 @@ void display_sm64_magnitude_test() {
             
 
         draw_center_cross(ctx, 160);
-        if (current_comparison > 0) {
-            draw_stick_angles(
-                ctx,
-                *live_comparisons[current_comparison],
-                comparison_color,
-                zoomout,
-                160
-            );
-        }
+
+        /*
+        draw_stick_angles(
+            ctx,
+            *live_comparisons[current_comparison],
+            comparison_color,
+            zoomout,
+            160
+        );
+        */
 
         if (show_history == 1) {
             int history_update = 0;
-            if (v.x != history[0].x || v.y != history[0].y) {
+            bool hasChanged = v.x != history[0].x || v.y != history[0].y;
+            bool isNotInDeadzone = abs(v.x) >= 8 || abs(v.y) >= 8;
+
+            if (hasChanged && isNotInDeadzone) {
                 history_update = 1;
                 if (count < sz_history - 1) {
                     count++;
                 }
 
-                history[0] = v;
+                history[0] = vNoDeadZone;
             }
 
             for (int i = count; i > 0; i--) {
@@ -278,8 +288,8 @@ void display_sm64_magnitude_test() {
             }
         }
 
-        int x = smax(0, smin(320, (v.x * zoomout_factor) + 158));
-        int y = smax(0, smin(240, ((v.y * zoomout_factor) * -1) + 118));
+        int x = smax(0, smin(320, (vNoDeadZone.x * zoomout_factor) + 158));
+        int y = smax(0, smin(240, ((vNoDeadZone.y * zoomout_factor) * -1) + 118));
         graphics_draw_sprite(ctx, x, y, point);
 
         if (cdata.c[0].start) {
@@ -298,17 +308,6 @@ void display_sm64_magnitude_test() {
         if (cdata.c[0].Z) {
             zoomout ^= 1;
             zoomout_factor = (zoomout == 0) ? 1 : 0.75;
-        }
-
-        if (cdata.c[0].left || cdata.c[0].L) {
-            current_comparison--;
-            if (current_comparison < 0) current_comparison += comparison_count;
-            title_str = get_title_str(current_comparison);
-        }
-
-        if (cdata.c[0].right || cdata.c[0].R) {
-            current_comparison = (current_comparison + 1) % comparison_count;
-            title_str = get_title_str(current_comparison);
         }
 
         text_set_font(FONT_MEDIUM);
