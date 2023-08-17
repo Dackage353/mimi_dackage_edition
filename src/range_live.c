@@ -177,3 +177,143 @@ void display_live_ranges() {
     free(point);
 
 }
+
+void display_sm64_magnitude_test() {
+    
+    int count = 0,
+        line_height = 11,
+        show_history = 1,
+        sz_history = 1024,
+        current_comparison = 1,
+        comparison_count = sizeof(live_comparisons) / sizeof(0),
+        zoomout = 0;
+    float zoomout_factor = 1;
+    text_set_line_height(line_height);
+    display_context_t ctx;
+
+    int f = dfs_open("/gfx/point.sprite");
+    int size = dfs_size(f);
+    char * title_str = get_title_str(current_comparison);
+    sprite_t *point = malloc(size);
+    dfs_read(point, size, 1, f);
+    dfs_close(f);
+
+    struct Vec2 history[sz_history];
+
+    uint32_t comparison_color = graphics_make_color(64, 255, 0, 255),
+             history_color = graphics_make_color(0, 192, 255, 255);
+
+    for (;;) {
+        while ((ctx = display_lock()) == 0) {}
+        display_show(ctx);
+
+        graphics_fill_screen(ctx, COLOR_BACKGROUND);
+        graphics_set_color(COLOR_FOREGROUND, 0);
+
+        controller_scan();
+        struct controller_data cdata = get_keys_pressed();
+        char buf[128];
+
+        
+        struct Vec2 v = { cdata.c[0].x, cdata.c[0].y };
+        struct Vec2 netV = { 0, 0 };
+
+        if (abs(v.x) >= 8) { netV.x = abs(v.x) - 6; }
+        if (abs(v.y) >= 8) { netV.y = abs(v.y) - 6; }
+
+        float magnitudeNoCap = sqrt(netV.x * netV.x + netV.y * netV.y);
+        float magnitude = magnitudeNoCap;
+        if (magnitudeNoCap > 64.0f) { magnitude = 64.0f; }
+
+        float angle = atan2(netV.y, netV.x) * 180 / M_PI;
+
+        snprintf(buf, sizeof(buf), "x\ny\nnetX\nnetY\nmag\nmagNoCap\nangle");
+        text_set_font(FONT_MEDIUM);
+        text_draw(ctx, 250, 80 - line_height, buf, ALIGN_LEFT);
+
+        text_set_font(FONT_BOLD);
+        snprintf(buf, sizeof(buf), "%3d\n%3d\n%3d\n%3d\n%.2f\n%.2f\n%.2f", v.x, v.y, netV.x, netV.y, magnitude, magnitudeNoCap, angle);
+        text_draw(ctx, 242, 80 - line_height, buf, ALIGN_RIGHT);
+
+            
+
+        draw_center_cross(ctx, 160);
+        if (current_comparison > 0) {
+            draw_stick_angles(
+                ctx,
+                *live_comparisons[current_comparison],
+                comparison_color,
+                zoomout,
+                160
+            );
+        }
+
+        if (show_history == 1) {
+            int history_update = 0;
+            if (v.x != history[0].x || v.y != history[0].y) {
+                history_update = 1;
+                if (count < sz_history - 1) {
+                    count++;
+                }
+
+                history[0] = v;
+            }
+
+            for (int i = count; i > 0; i--) {
+                if (history_update == 1) history[i] = history[i - 1];
+                int x = smax(0, smin(320, (history[i].x * zoomout_factor) + 160));
+                int y = smax(0, smin(240, ((history[i].y * zoomout_factor) * -1) + 120));
+                graphics_draw_pixel(ctx, x, y, history_color);
+            }
+        }
+
+        int x = smax(0, smin(320, (v.x * zoomout_factor) + 158));
+        int y = smax(0, smin(240, ((v.y * zoomout_factor) * -1) + 118));
+        graphics_draw_sprite(ctx, x, y, point);
+
+        if (cdata.c[0].start) {
+            break;
+        }
+
+        cdata = get_keys_down_filtered();
+        if (cdata.c[0].A) {
+            show_history ^= 1;
+        }
+
+        if (cdata.c[0].B) {
+            count = 0;
+        }
+
+        if (cdata.c[0].Z) {
+            zoomout ^= 1;
+            zoomout_factor = (zoomout == 0) ? 1 : 0.75;
+        }
+
+        if (cdata.c[0].left || cdata.c[0].L) {
+            current_comparison--;
+            if (current_comparison < 0) current_comparison += comparison_count;
+            title_str = get_title_str(current_comparison);
+        }
+
+        if (cdata.c[0].right || cdata.c[0].R) {
+            current_comparison = (current_comparison + 1) % comparison_count;
+            title_str = get_title_str(current_comparison);
+        }
+
+        text_set_font(FONT_MEDIUM);
+        snprintf(buf, sizeof(buf), "%s", title_str);
+        text_draw(ctx, 160, 15, buf, ALIGN_CENTER);
+
+        if (zoomout) {
+            text_draw(ctx, 16, 213, "75\% scale", ALIGN_LEFT);
+        }
+
+        text_set_font(FONT_MEDIUM);
+        graphics_set_color(graphics_make_color(128, 128, 128, 255), 0);
+        text_draw(ctx, 320 - 16, 213, REPO_URL, ALIGN_RIGHT);
+    }
+
+    free(point);
+
+    
+}
