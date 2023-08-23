@@ -196,7 +196,7 @@ void display_sm64_magnitude_test() {
     int count = 0,
         line_height = 11,
         show_history = 1,
-        sz_history = 10240;
+        sz_history = 1024;
     text_set_line_height(line_height);
     display_context_t ctx;
 
@@ -206,7 +206,7 @@ void display_sm64_magnitude_test() {
     dfs_read(point, size, 1, f);
     dfs_close(f);
 
-    char * title_str = "values that affect the magnitude calculation";
+    char * title_str = "raw values that affect the magnitude calculation";
 
     struct Vec2 history[sz_history];
 
@@ -224,54 +224,69 @@ void display_sm64_magnitude_test() {
 
         controller_scan();
         struct controller_data cdata = get_keys_pressed();
-        char buf[128];
+        char buf[256];
 
         
-        struct Vec2 v = { cdata.c[0].x, cdata.c[0].y };
-        struct Vec2 vNoDeadZone = { cdata.c[0].x, cdata.c[0].y };
-        struct Vec2 netV = { 0, 0 };
 
-        if (vNoDeadZone.x < 8 && vNoDeadZone.x > -8) {
-            vNoDeadZone.x = 0;
+        struct Vec2 rawStick = { cdata.c[0].x, cdata.c[0].y };
+        struct Vec2 rawStickNoDeadzone = { cdata.c[0].x, cdata.c[0].y };
+        struct Vec2 netStick = { 0, 0 };
+
+        if (rawStickNoDeadzone.x < 8 && rawStickNoDeadzone.x > -8) {
+            rawStickNoDeadzone.x = 0;
         }
-        if (vNoDeadZone.y < 8 && vNoDeadZone.y > -8) {
-            vNoDeadZone.y = 0;
+        if (rawStickNoDeadzone.y < 8 && rawStickNoDeadzone.y > -8) {
+            rawStickNoDeadzone.y = 0;
         }
 
 
-        if (v.x <= -8) {
-            netV.x = v.x + 6;
+        if (rawStick.x <= -8) {
+            netStick.x = rawStick.x + 6;
         }
-        else if (v.x >= 8) {
-            netV.x = v.x - 6;
+        else if (rawStick.x >= 8) {
+            netStick.x = rawStick.x - 6;
         }
         
-        if (v.y <= -8) {
-            netV.y = v.y + 6;
+        if (rawStick.y <= -8) {
+            netStick.y = rawStick.y + 6;
         }
-        else if (v.y >= 8) {
-            netV.y = v.y - 6;
+        else if (rawStick.y >= 8) {
+            netStick.y = rawStick.y - 6;
         }
 
-        float magnitudeNoCap = sqrt(netV.x * netV.x + netV.y * netV.y);
+        float magnitudeNoCap = sqrt(netStick.x * netStick.x + netStick.y * netStick.y);
         float magnitude = magnitudeNoCap;
+
+        struct Vec2f finalStick = { 0, 0 };
+        
+        if (magnitudeNoCap > 0)
+        {
+            finalStick.x = netStick.x * 64 / magnitudeNoCap;
+            finalStick.y = netStick.y * 64 / magnitudeNoCap;
+        }
+
+
         if (magnitudeNoCap > 64.0f) { magnitude = 64.0f; }
 
-        float angle = atan2(abs(netV.y), abs(netV.x)) * 180 / M_PI;
+        float angle = get_angle(finalStick.x, finalStick.y);
 
-        snprintf(buf, sizeof(buf), "x\ny\nnetX\nnetY\nmag\nmagNoCap\nangle");
+        //rawStickX\nrawStickY\nstickXNoCap\nstickYNoCap\n\nmagnitude\nmagnitudeNoCap\n\nstickX\nstickY\nangle
+        //snprintf(buf, sizeof(buf), "%3d\n%3d\n%3d\n%3d\n\n%.2f\n%.2f\n\n%.2f\n%.2f\n%.2f", rawStick.x, rawStick.y, netStick.x, netStick.y, magnitude, magnitudeNoCap, finalStick.x, finalStick.y, angle);
+
+        snprintf(buf, sizeof(buf), "rawStickX\nrawStickY\nnetStickX\nnetStickY\n\nmagnitude\nmagnitudeNoCap\n\nfinalStickX\nfinalStickY\nangle");
         text_set_font(FONT_MEDIUM);
-        text_draw(ctx, 250, 80 - line_height, buf, ALIGN_LEFT);
+        text_draw(ctx, 220, 60 - line_height, buf, ALIGN_LEFT);
 
         text_set_font(FONT_BOLD);
-        snprintf(buf, sizeof(buf), "%3d\n%3d\n%3d\n%3d\n%.2f\n%.2f\n%.2f", v.x, v.y, netV.x, netV.y, magnitude, magnitudeNoCap, angle);
-        text_draw(ctx, 242, 80 - line_height, buf, ALIGN_RIGHT);
+        snprintf(buf, sizeof(buf), "%3d\n%3d\n%3d\n%3d\n\n%.2f\n%.2f\n\n%.2f\n%.2f\n%.2f", rawStick.x, rawStick.y, netStick.x, netStick.y, magnitude, magnitudeNoCap, finalStick.x, finalStick.y, angle);
+        text_draw(ctx, 212, 60 - line_height, buf, ALIGN_RIGHT);
 
+        
 
         if (show_history == 1) {
             int history_update = 0;
-            bool hasChanged = v.x != history[0].x || v.y != history[0].y;
-            bool isNotInDeadzone = abs(v.x) >= 8 || abs(v.y) >= 8;
+            bool hasChanged = rawStick.x != history[0].x || rawStick.y != history[0].y;
+            bool isNotInDeadzone = abs(rawStick.x) >= 8 || abs(rawStick.y) >= 8;
 
             if (hasChanged && isNotInDeadzone) {
                 history_update = 1;
@@ -279,7 +294,7 @@ void display_sm64_magnitude_test() {
                     count++;
                 }
 
-                history[0] = vNoDeadZone;
+                history[0] = rawStickNoDeadzone;
             }
 
             for (int i = count; i > 0; i--) {
@@ -290,8 +305,8 @@ void display_sm64_magnitude_test() {
             }
         }
 
-        int x = smax(0, smin(320, vNoDeadZone.x + 158));
-        int y = smax(0, smin(240, (vNoDeadZone.y * -1) + 118));
+        int x = smax(0, smin(320, rawStickNoDeadzone.x + 158));
+        int y = smax(0, smin(240, (rawStickNoDeadzone.y * -1) + 118));
         graphics_draw_sprite(ctx, x, y, point);
 
 

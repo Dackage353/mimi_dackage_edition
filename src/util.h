@@ -8,6 +8,13 @@ struct Vec2
     int y;
 };
 
+
+struct Vec2f
+{
+    float x;
+    float y;
+};
+
 static inline int smin(int a, int b)
 {
     return a > b ? b : a;
