@@ -97,15 +97,14 @@ void display_sm64_magnitude_test() {
         float magnitudeNoCap = sqrt(pow(netStick.x, 2) + pow(netStick.y, 2));
         float magnitude = magnitudeNoCap;
 
-        struct Vec2f finalStick = { 0, 0 };
+        struct Vec2f finalStick = { netStick.x, netStick.y };
         
-        if (magnitudeNoCap > 0)
+        if (magnitudeNoCap > 64)
         {
             finalStick.x = netStick.x * 64 / magnitudeNoCap;
             finalStick.y = netStick.y * 64 / magnitudeNoCap;
+            magnitude = 64.0f;
         }
-
-        if (magnitudeNoCap > 64.0f) { magnitude = 64.0f; }
 
         float angleDegrees = get_angle_degrees(finalStick.x, finalStick.y);
         float angleRadians = get_angle_radians(finalStick.x, finalStick.y);

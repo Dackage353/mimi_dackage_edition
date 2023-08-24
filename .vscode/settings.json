@@ -2,6 +2,7 @@
     "C_Cpp.errorSquiggles": "Disabled",
     "files.associations": {
         "input.h": "c",
-        "xutility": "c"
+        "xutility": "c",
+        "cmath": "c"
     }
 }
