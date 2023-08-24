@@ -192,10 +192,10 @@ void print_stick_angles(display_context_t ctx, struct StickAngles a)
     }
 
     float angles[] = {
-        get_angle(diagonals[0], diagonals[1]),
-        get_angle(diagonals[2], diagonals[3]),
-        get_angle(diagonals[4], diagonals[5]),
-        get_angle(diagonals[6], diagonals[7]),
+        get_angle_degrees(diagonals[0], diagonals[1]),
+        get_angle_degrees(diagonals[2], diagonals[3]),
+        get_angle_degrees(diagonals[4], diagonals[5]),
+        get_angle_degrees(diagonals[6], diagonals[7]),
     };
 
     y = 15 + 60;

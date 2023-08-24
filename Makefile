@@ -20,7 +20,7 @@ build/main.o: .FORCE
 SRCS = $(wildcard $(SOURCE_DIR)/*.c)
 OBJS = $(SRCS:$(SOURCE_DIR)/%.c=$(BUILD_DIR)/%.o)
 
-$(ROMNAME): N64_ROM_TITLE="mimi controller test"
+$(ROMNAME): N64_ROM_TITLE="mimi dack edition"
 $(ROMNAME): $(FS)
 
 $(FS): $(wildcard fs/*) $(wildcard gfx/*)
@@ -34,8 +34,9 @@ $(FS): $(wildcard fs/*) $(wildcard gfx/*)
 	$(N64_ROOTDIR)/bin/mksprite 32 gfx/stick_6.png fs/gfx/stick_6.sprite
 	$(N64_ROOTDIR)/bin/mksprite 32 gfx/stick_7.png fs/gfx/stick_7.sprite
 	$(N64_ROOTDIR)/bin/mksprite 32 gfx/stick_neutral.png fs/gfx/stick_neutral.sprite
-	$(N64_ROOTDIR)/bin/mksprite 32 gfx/point.png fs/gfx/point.sprite
-	$(N64_ROOTDIR)/bin/mksprite 32 gfx/best_circle.png fs/gfx/circle.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/point_main.png fs/gfx/point_main.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/point_red.png fs/gfx/point_red.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/point_purple.png fs/gfx/point_purple.sprite
 	$(N64_MKDFS) $@ fs
 
 $(BUILD_DIR)/$(NAME).elf: $(OBJS)

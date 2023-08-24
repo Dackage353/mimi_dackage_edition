@@ -4,6 +4,7 @@
 
 #include "range_test.h"
 #include "range_live.h"
+#include "sm64_magnitude_test.h"
 #include "oscilloscope.h"
 #include "text.h"
 #include "colors.h"
@@ -18,7 +19,6 @@ enum Screen
     SCR_RANGE_RESULT,
     SCR_LIVE,
     SCR_OSCOPE,
-    SCR_SM64_MAGNITUDE_EXPLANATION,
     SCR_SM64_MAGNITUDE_TEST,
 };
 
@@ -75,7 +75,6 @@ int main(void)
                     "Oscilloscope display",
                     "Help",
                     "About",
-                    "SM64 magnitude explanation",
                     "SM64 magnitude test",
                 };
 
@@ -129,9 +128,6 @@ int main(void)
                         current_screen = SCR_ABOUT;
                         break;
                     case 8:
-                        current_screen = SCR_SM64_MAGNITUDE_EXPLANATION;
-                        break;
-                    case 9:
                         current_screen = SCR_SM64_MAGNITUDE_TEST;
                         break;
                     }
@@ -171,43 +167,6 @@ int main(void)
                     "version " ROM_VERSION ", built on " __DATE__ "\n\n"
                     "my fork: "REPO_URL "\n"
                     "main repo: github.com/wermipls/mimi"
-                );
-
-                display_show(ctx);
-
-                controller_scan();
-                struct controller_data cdata = get_keys_down_filtered();
-                
-                if (cdata.c[0].A || cdata.c[0].B || cdata.c[0].start) {
-                    current_screen = SCR_MAIN_MENU;
-                    break;
-                }
-            }
-            break;
-        case SCR_SM64_MAGNITUDE_EXPLANATION:
-            text_set_line_height(11);
-            for (;;) {
-                while ((ctx = display_lock()) == 0) {}
-
-                graphics_fill_screen(ctx, COLOR_BACKGROUND);
-
-                graphics_set_color(COLOR_FOREGROUND, 0);
-                text_set_font(FONT_BOLD);
-
-                text_draw(ctx, 32, 24, "SM64 Magnitude Explanation", ALIGN_LEFT);
-
-                text_set_font(FONT_MEDIUM);
-
-                text_draw_wordwrap(ctx, 32, 44, 320-64, 
-                    "the magnitude is a float while the stick x and y are signed bytes\n"
-                    "Maximum magnitude is 64.0f\n"
-                    "x and y values below 8 are ignored\n\n"
-
-                    "simplified magnitude calculation: \n"
-                    "x = abs(x) - 6\n"
-                    "y = abs(y) - 6\n"
-                    "magnitude = sqrt(x^2 + y^2)\n"
-
                 );
 
                 display_show(ctx);

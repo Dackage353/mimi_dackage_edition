@@ -25,7 +25,12 @@ static inline int smax(int a, int b)
     return a > b ? a : b;
 }
 
-static inline float get_angle(float x, float y)
+static inline float get_angle_radians(float x, float y)
 {
-    return atan2f(x, y) * 180 / 3.14159;
+    return atan2f(y, x);
+}
+
+static inline float get_angle_degrees(float x, float y)
+{
+    return atan2f(y, x) * 180 / 3.14159;
 }
