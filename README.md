@@ -1,10 +1,12 @@
 ## mimi dackage edition
 ![Example screenshot](doc/deadzone_example.PNG)
 ![Example screenshot](doc/magnitude_and_angle_example.PNG)
+
 <br/>
+
 This is a fork of wermi's mimi N64 ROM that is used to test controller angles.
 
-It adds a magnitude testing mode that demonstrates how stick values and magnitude works in SM64.
+It adds a magnitude testing mode that demonstrates how stick values and magnitude work in SM64.
 
 
 ## Download
@@ -26,7 +28,7 @@ Press L or R to change modes, B to clear, A to hide dots, Z to hide values, Star
 - magnitudeNoCap, magnitude, finalStickX, finalStickY, intendedMagnitude, angle are all floats.
 
 - rawStickX and rawStickY are the raw stick values given by the controller.
-- netStickX and netStickY are the raw stick values that have a deadzone of 7. Also their values are increased/decreased by up to 6. Note that net stick values of 1 are impossible.
+- netStickX and netStickY are the raw stick values that have a deadzone of 7. Also their values are increased/decreased by 6. Note that net stick values of 1 or -1 are impossible.
 - magnitudeNoCap is a result of the magnitude calculation of sqrt(netStickX^2 + netStickY^2)
 - magnitude is magnitudeNoCap but capped at 64.
 - finalStickX and finalStickY are the final intended values calculated by netStickX * 64 / magnitude and netStickY * 64 / magnitude. 
