@@ -1,6 +1,6 @@
 ## mimi dackage edition
-![Example screenshot](doc/deadzone_example.png)
-![Example screenshot](doc/magnitude_and_angle_example.png)
+![Example screenshot](doc/deadzone_example.PNG)
+![Example screenshot](doc/magnitude_and_angle_example.PNG)
 This is a fork of wermi's mimi N64 ROM that is used to test controller angles.
 
 It adds a magnitude testing mode that demonstrates how stick values and magnitude works in SM64.
@@ -36,7 +36,7 @@ Press L or R to change modes, B to clear, A to hide dots, Z to hide values, Star
 
 - intendedMagnitude is calculated by (magnitude / 64)^2 * 64 / 2. This is used to calculate Mario's target speed. Note that Mario's run speed and the maximum intendedMagnitude are both 32.
 - The curve of this formula can be visualized here:
-![Example screenshot](doc/intended_magnitude.png)
+![Example screenshot](doc/intended_magnitude.PNG)
 - The x-axis is the magnitude while the y-axis is the resulting intendedMagnitude.
 - The red line is the intendedMagnitude formula while the blue line is probably what most would expect how it would work.
 - Because of this curvature, the intendedMagnitude increases slowly at first and then increases more rapidly as it goes right.
