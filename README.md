@@ -37,11 +37,13 @@ Press L or R to change modes, B to clear, A to hide dots, Z to hide values, Star
 
 - intendedMagnitude is calculated by (magnitude / 64)^2 * 64 / 2. This is used to calculate Mario's target speed. Note that Mario's run speed and the maximum intendedMagnitude are both 32.
 - The curve of this formula can be visualized here:
+
 <br/>
 
 ![Example screenshot](doc/intended_magnitude.PNG)
 
 <br/>
+
 - The x-axis is the magnitude while the y-axis is the resulting intendedMagnitude.
 - The red line is the intendedMagnitude formula while the blue line is probably what most would expect how it would work.
 - Because of this curvature, the intendedMagnitude increases slowly at first and then increases more rapidly as it goes right.
